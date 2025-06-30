@@ -4,6 +4,12 @@ on:
   push:
     branches:
       - main
+    paths:
+      - '**/cs-note/*.md'
+      - '.github/workflows/generate-links.yml'
+
+permissions:
+  contents: write
 
 jobs:
   generate-links:
