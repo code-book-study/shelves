@@ -5,7 +5,6 @@ on:
     branches:
       - main
     paths:
-      - "/cs-note/*.md"
       - "**/cs-note/*.md"
       - ".github/workflows/generate-links.yml"
 
@@ -23,19 +22,26 @@ jobs:
           TEAM_DIRS="이예서 이동현 이명욱"
           BOOKS=$(find $TEAM_DIRS -type d -name 'cs-note' | sort | uniq)
           for book in $BOOKS; do
-            # book: 이예서/cs-note, 이동현/cs-note, ...
             CHAPTERS=$(find $book -type f -name '*.md' -exec basename {} \; | sort | uniq)
             for chapter in $CHAPTERS; do
               DIR=cs-note
               mkdir -p $DIR
               OUT=$DIR/$chapter
-              echo "# 팀원별 정리 링크" > $OUT
+              [ -f "$OUT" ] && CONTENTS="$(cat "$OUT")" || CONTENTS=""
+              LINKS="<!-- TEAM_LINKS_START -->\n## 팀원별 정리 링크\n"
               for member in $TEAM_DIRS; do
                 SRC="$member/$DIR/$chapter"
                 if [ -f "$SRC" ]; then
-                  echo "- [$member-$(basename $chapter .md)]($SRC)" >> $OUT
+                  LINKS="$LINKS- [$member-$(basename $chapter .md)]($SRC)\n"
                 fi
               done
+              LINKS="$LINKS<!-- TEAM_LINKS_END -->"
+              if echo "$CONTENTS" | grep -q '<!-- TEAM_LINKS_START -->'; then
+                NEW_CONTENTS=$(echo "$CONTENTS" | awk '/<!-- TEAM_LINKS_START -->/{f=1;print;next}/<!-- TEAM_LINKS_END -->/{f=0;print;next}!f' | sed "/<!-- TEAM_LINKS_START -->/,/<!-- TEAM_LINKS_END -->/c\\$LINKS")
+              else
+                NEW_CONTENTS="$CONTENTS\n\n$LINKS"
+              fi
+              echo -e "$NEW_CONTENTS" > "$OUT"
             done
           done
 
