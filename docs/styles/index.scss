@@ -1,0 +1,12 @@
+.sidebar {
+  ul {
+    li {
+      > a {
+        padding-left: 5px;
+      }
+      &.active > a {
+        background-color: #e7fbf1;
+      }
+    }
+  }
+}
