@@ -1,0 +1,42 @@
+name: Generate Team Note Links
+
+on:
+  push:
+    paths:
+      - '**/cs-note/*.md'
+      - '.github/workflows/generate-links.yml'
+
+jobs:
+  generate-links:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Generate links for all chapters and members
+        run: |
+          TEAM_DIRS="이예서 홍길동 김철수 박영희"
+          BOOKS=$(find 이예서 홍길동 김철수 박영희 -type d -name 'cs-note' | sort | uniq)
+          for book in $BOOKS; do
+            # book: 이예서/cs-note, 홍길동/cs-note, ...
+            CHAPTERS=$(find $book -type f -name '*.md' -exec basename {} \; | sort | uniq)
+            for chapter in $CHAPTERS; do
+              DOCS_DIR=docs/$(basename $book)
+              mkdir -p $DOCS_DIR
+              OUT=$DOCS_DIR/$chapter
+              echo "# 팀원별 정리 링크" > $OUT
+              for member in $TEAM_DIRS; do
+                SRC="$member/$(basename $book)/$chapter"
+                if [ -f "$SRC" ]; then
+                  echo "- [$member-$(basename $chapter .md)](../../$SRC)" >> $OUT
+                fi
+              done
+            done
+          done
+
+      - name: Commit and push if changed
+        run: |
+          git config --global user.name 'github-actions[bot]'
+          git config --global user.email 'github-actions[bot]@users.noreply.github.com'
+          git add docs/
+          git diff --cached --quiet || git commit -m '자동 링크 생성: 팀원 md → docs 링크'
+          git push
