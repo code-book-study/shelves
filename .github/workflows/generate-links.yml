@@ -5,8 +5,9 @@ on:
     branches:
       - main
     paths:
-      - '**/cs-note/*.md'
-      - '.github/workflows/generate-links.yml'
+      - "/cs-note/*.md"
+      - "**/cs-note/*.md"
+      - ".github/workflows/generate-links.yml"
 
 permissions:
   contents: write
@@ -19,20 +20,20 @@ jobs:
 
       - name: Generate links for all chapters and members
         run: |
-          TEAM_DIRS="이예서 이동현 이명욱 정민희"
-          BOOKS=$(find 이예서 이동현 이명욱 정민희 -type d -name 'cs-note' | sort | uniq)
+          TEAM_DIRS="이예서 이동현 이명욱"
+          BOOKS=$(find $TEAM_DIRS -type d -name 'cs-note' | sort | uniq)
           for book in $BOOKS; do
             # book: 이예서/cs-note, 이동현/cs-note, ...
             CHAPTERS=$(find $book -type f -name '*.md' -exec basename {} \; | sort | uniq)
             for chapter in $CHAPTERS; do
-              DOCS_DIR=docs/$(basename $book)
-              mkdir -p $DOCS_DIR
-              OUT=$DOCS_DIR/$chapter
+              DIR=cs-note
+              mkdir -p $DIR
+              OUT=$DIR/$chapter
               echo "# 팀원별 정리 링크" > $OUT
               for member in $TEAM_DIRS; do
-                SRC="$member/$(basename $book)/$chapter"
+                SRC="$member/$DIR/$chapter"
                 if [ -f "$SRC" ]; then
-                  echo "- [$member-$(basename $chapter .md)](../../$SRC)" >> $OUT
+                  echo "- [$member-$(basename $chapter .md)]($SRC)" >> $OUT
                 fi
               done
             done
@@ -42,6 +43,6 @@ jobs:
         run: |
           git config --global user.name 'github-actions[bot]'
           git config --global user.email 'github-actions[bot]@users.noreply.github.com'
-          git add docs/
-          git diff --cached --quiet || git commit -m '자동 링크 생성: 팀원 md → docs 링크'
+          git add cs-note/
+          git diff --cached --quiet || git commit -m 'chore: 자동 링크 생성: 팀원 md → cs-note 링크'
           git push
