@@ -1,7 +1,5 @@
 # 📂 챕터
 
-- 1
-- 2
-- 3
-- 4
-- 5
+## [chapter1](cs_note/chapter1.md)
+
+## [chapter2](cs_note/chapter2.md)

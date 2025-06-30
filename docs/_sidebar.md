@@ -1,3 +1,3 @@
-[Home](README.md)
-
-[🧩 면접을 위한 CS 전공지식 노트](cs_note/index.md)
+- [🧩 면접을 위한 CS 전공지식 노트](cs_note/index.md)
+  - [chapter1](cs_note/chapter1.md)
+  - [chapter2](cs_note/chapter2.md)
