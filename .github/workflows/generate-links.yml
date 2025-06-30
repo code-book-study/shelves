@@ -2,9 +2,8 @@ name: Generate Team Note Links
 
 on:
   push:
-    paths:
-      - '**/cs-note/*.md'
-      - '.github/workflows/generate-links.yml'
+    branches:
+      - main
 
 jobs:
   generate-links:
@@ -14,10 +13,10 @@ jobs:
 
       - name: Generate links for all chapters and members
         run: |
-          TEAM_DIRS="이예서 홍길동 김철수 박영희"
-          BOOKS=$(find 이예서 홍길동 김철수 박영희 -type d -name 'cs-note' | sort | uniq)
+          TEAM_DIRS="이예서 이동현 이명욱 정민희"
+          BOOKS=$(find 이예서 이동현 이명욱 정민희 -type d -name 'cs-note' | sort | uniq)
           for book in $BOOKS; do
-            # book: 이예서/cs-note, 홍길동/cs-note, ...
+            # book: 이예서/cs-note, 이동현/cs-note, ...
             CHAPTERS=$(find $book -type f -name '*.md' -exec basename {} \; | sort | uniq)
             for chapter in $CHAPTERS; do
               DOCS_DIR=docs/$(basename $book)
