@@ -1,4 +1,8 @@
 .sidebar {
+  & &-nav {
+    padding-left: 1rem;
+  }
+
   ul {
     li {
       > a {
