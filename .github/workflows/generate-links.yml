@@ -6,6 +6,7 @@ on:
       - main
     paths:
       - "**/cs-note/*.md"
+      - "**/elegant-typescript/*.md"
       - ".github/workflows/generate-links.yml"
 
 permissions:
@@ -17,31 +18,33 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Generate links for all chapters and members
+      - name: Generate links for all chapters and members (multi-book)
         run: |
+          BOOK_DIRS="cs-note elegant-typescript"
           TEAM_DIRS="이예서 이동현 이명욱"
-          BOOKS=$(find $TEAM_DIRS -type d -name 'cs-note' | sort | uniq)
-          for book in $BOOKS; do
-            CHAPTERS=$(find $book -type f -name '*.md' -exec basename {} \; | sort | uniq)
-            for chapter in $CHAPTERS; do
-              DIR=cs-note
-              mkdir -p $DIR
-              OUT=$DIR/$chapter
-              [ -f "$OUT" ] && CONTENTS="$(cat "$OUT")" || CONTENTS=""
-              LINKS="<!-- TEAM_LINKS_START -->\n## 팀원별 정리 링크\n"
-              for member in $TEAM_DIRS; do
-                SRC="$member/$DIR/$chapter"
-                if [ -f "$SRC" ]; then
-                  LINKS="$LINKS- [$member-$(basename $chapter .md)]($SRC)\n"
+          for DIR in $BOOK_DIRS; do
+            BOOKS=$(find $TEAM_DIRS -type d -name "$DIR" | sort | uniq)
+            for book in $BOOKS; do
+              CHAPTERS=$(find $book -type f -name '*.md' -exec basename {} \; | sort | uniq)
+              for chapter in $CHAPTERS; do
+                mkdir -p $DIR
+                OUT=$DIR/$chapter
+                [ -f "$OUT" ] && CONTENTS="$(cat "$OUT")" || CONTENTS=""
+                LINKS="<!-- TEAM_LINKS_START -->\n## 팀원별 정리 링크\n"
+                for member in $TEAM_DIRS; do
+                  SRC="$member/$DIR/$chapter"
+                  if [ -f "$SRC" ]; then
+                    LINKS="$LINKS- [$member-$(basename $chapter .md)]($SRC)\n"
+                  fi
+                done
+                LINKS="$LINKS<!-- TEAM_LINKS_END -->"
+                if echo "$CONTENTS" | grep -q '<!-- TEAM_LINKS_START -->'; then
+                  NEW_CONTENTS=$(echo "$CONTENTS" | awk '/<!-- TEAM_LINKS_START -->/{f=1;print;next}/<!-- TEAM_LINKS_END -->/{f=0;print;next}!f' | sed "/<!-- TEAM_LINKS_START -->/,/<!-- TEAM_LINKS_END -->/c\\$LINKS")
+                else
+                  NEW_CONTENTS="$CONTENTS\n\n$LINKS"
                 fi
+                echo -e "$NEW_CONTENTS" > "$OUT"
               done
-              LINKS="$LINKS<!-- TEAM_LINKS_END -->"
-              if echo "$CONTENTS" | grep -q '<!-- TEAM_LINKS_START -->'; then
-                NEW_CONTENTS=$(echo "$CONTENTS" | awk '/<!-- TEAM_LINKS_START -->/{f=1;print;next}/<!-- TEAM_LINKS_END -->/{f=0;print;next}!f' | sed "/<!-- TEAM_LINKS_START -->/,/<!-- TEAM_LINKS_END -->/c\\$LINKS")
-              else
-                NEW_CONTENTS="$CONTENTS\n\n$LINKS"
-              fi
-              echo -e "$NEW_CONTENTS" > "$OUT"
             done
           done
 
@@ -49,7 +52,7 @@ jobs:
         run: |
           git config --global user.name 'github-actions[bot]'
           git config --global user.email 'github-actions[bot]@users.noreply.github.com'
-          git add cs-note/
+          git add cs-note/ elegant-typescript/
           git diff --cached --quiet || git commit -m 'chore: 자동 링크 생성'
           git pull --rebase origin main
           git push
