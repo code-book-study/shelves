@@ -4,7 +4,6 @@ on:
   push:
     branches:
       - main
-      - settings
     paths:
       - "**/cs-note/*.md"
       - "**/elegant-typescript/*.md"
@@ -55,5 +54,4 @@ jobs:
           git config --global user.email 'github-actions[bot]@users.noreply.github.com'
           git add cs-note/ elegant-typescript/
           git diff --cached --quiet || git commit -m 'chore: 자동 링크 생성'
-          git pull --rebase origin settings
           git push
