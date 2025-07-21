@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - main
+      - settings
     paths:
       - "**/cs-note/*.md"
       - "**/elegant-typescript/*.md"
