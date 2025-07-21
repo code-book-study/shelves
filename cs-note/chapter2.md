@@ -5,6 +5,9 @@
 ## bbb
 
 <!-- TEAM_LINKS_START -->
+
 ## 팀원별 정리 링크
+
 - [이명욱-chapter2](이명욱/cs-note/chapter2.md)
+- [이동현-chapter2](이동현/cs-note/chapter2.md)
 <!-- TEAM_LINKS_END -->
