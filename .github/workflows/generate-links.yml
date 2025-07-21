@@ -55,5 +55,5 @@ jobs:
           git config --global user.email 'github-actions[bot]@users.noreply.github.com'
           git add cs-note/ elegant-typescript/
           git diff --cached --quiet || git commit -m 'chore: 자동 링크 생성'
-          git pull --rebase origin main
+          git pull --rebase origin settings
           git push
